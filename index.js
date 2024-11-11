@@ -1,9 +1,24 @@
 import * as THREE from "three";
 import { OrbitControls } from "jsm/controls/OrbitControls.js";
-import spline from "./spline.js";
 import { EffectComposer } from "jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "jsm/postprocessing/UnrealBloomPass.js";
+
+const curvePath = [
+  10.136, -1.374, 10.385, 9.115, -1.374, 8.585, 9.067, -1.067, 5.894, 10.151,
+  -0.659, 3.434, 10.807, 1.886, 0.469, 10.761, 2.872, -1.281, 9.62, 2.872,
+  -3.283, 6.976, 2.766, -4.759, 6.046, 1.073, -6.664, 7.347, -1.823, -9.069,
+  7.226, -1.823, -10.5, 5.835, -1.823, -12.039, 3.653, -0.205, -13.877, -0.302,
+  1.597, -14.88, -2.893, 2.297, -13.892, -4.538, 4.586, -12.141, -6.129, 5.965,
+  -8.978, -6.012, 4.408, -6.712, -5.214, 2.821, -4.453, -2.342, 2.203, -3.079,
+  -0.008, 1.893, -1.658, -0.248, 2.885, 0.074, -2.217, 4.242, 2.216, -3.453,
+  3.062, 4.792, -3.736, 1.405, 7.843, -3.4, 1.192, 9.246, -1.885, 1.527, 10.306,
+  0.011, 2.11, 10.491, 0.426, 2.276, 11.613, 0.096, 0.032, 16.223, 2.346, 0.389,
+  19.912, 5.702, 1.733, 20.615, 7.972, 1.733, 19.303, 9.867, 0.09, 16.894,
+  -1.374, 14.279, 11.289, -1.374, 11.926, 10.136, -1.374, 10.385, -3.0, 3.5,
+  8.0, -5.0, 5.5, 6.0, -7.0, 6.0, 5.0, -9.0, 4.5, 2.0, -10.0, 2.5, 0.5, -8.0,
+  1.0, -3.0, -6.0, 0.5, -5.5, -4.0, -0.5, -7.5, -2.0, -1.0, -9.0,
+];
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x101020);
@@ -56,7 +71,15 @@ const particleMaterial = new THREE.PointsMaterial({
 const particleSystem = new THREE.Points(particles, particleMaterial);
 scene.add(particleSystem);
 
-const points = spline.getPoints(100);
+const points = [];
+const len = curvePath.length;
+for (let p = 0; p < len; p += 3) {
+  points.push(
+    new THREE.Vector3(curvePath[p], curvePath[p + 1], curvePath[p + 2])
+  );
+}
+
+const spline = new THREE.CatmullRomCurve3(points);
 const pointMaterial = new THREE.PointsMaterial({
   color: 0xffee88,
   size: 0.1,
